@@ -1,0 +1,23 @@
+<div *ngIf="todo">
+    <h2>Todo Details</h2>
+    <div><label>id: </label><b>{{todo.id}}</b></div>
+    <div style="margin: 1em 0 0 0;">
+        <label for="todo-name">name: </label>
+        <input id="todo-name" [(ngModel)]="todo.name" placeholder="Todo something" />
+    </div>
+    <div *ngIf="subTodos" style="margin: 1em 0 0 0;">
+        <label for="todo-name">sub-todos: </label>
+        <ul class="sub-todos">
+            <li *ngFor="let subTodo of subTodos">
+                <a routerLink="/detail/{{subTodo.id}}">
+                    <span class="badge">{{subTodo.id}}</span> {{subTodo.name}}
+                </a>
+                <button type="button" class="delete" title="delete sub-todo" (click)="deleteSubTodo(subTodo)">x</button>
+            </li>
+        </ul>
+    </div>
+
+    <button type="button" (click)="addSubTodo(todo)">add sub-todo</button>
+    <button type="button" (click)="goBack()">go back</button>
+    <button type="button" (click)="save()">save</button>
+</div>

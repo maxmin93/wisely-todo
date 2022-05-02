@@ -1,0 +1,34 @@
+<h2>My Todos</h2>
+
+<div>
+    <input id="new-todo" #todoName />
+
+    <!-- (click) passes input value to add() and then clears the input -->
+    <button type="button" class="add-button" (click)="add(todoName.value); todoName.value=''">
+        Add todo
+    </button>
+</div>
+
+<ul class="todos">
+    <li *ngFor="let todo of todos">
+        <div>
+            <a routerLink="/detail/{{todo.id}}">
+                <span class="badge">{{todo.id}}</span> {{todo.name}}
+            </a>
+            <button type="button" class="delete" title="delete todo" (click)="delete(todo)">x</button>
+            <button *ngIf="todo.arrtodos && todo.arrtodos.length > 0" type="button" class="has-subtodo"
+                matTooltip="{{ todo.arrtodos.join(' ,') }}" matTooltipPosition="right">
+                +{{todo.arrtodos.length}}
+            </button>
+        </div>
+    </li>
+</ul>
+
+<mat-paginator hidePageSize="true" showFirstLastButtons="true"
+    [length]="totalSize"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="handlePageEvent($event)"
+    aria-label="Select page">
+</mat-paginator>

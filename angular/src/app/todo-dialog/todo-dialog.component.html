@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Can be sub-todo</h2>
+<div mat-dialog-content>
+    <ul class="todos">
+        <li *ngFor="let todo of todos">
+            <a (click)="selectTodo(todo)">
+                <span class="badge">{{todo.id}}</span> {{todo.name}}
+            </a>
+        </li>
+    </ul>
+
+    <mat-paginator hidePageSize="true" showFirstLastButtons="true" [length]="totalSize" [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions" (page)="handlePageEvent($event)" aria-label="Select page">
+    </mat-paginator>
+</div>
