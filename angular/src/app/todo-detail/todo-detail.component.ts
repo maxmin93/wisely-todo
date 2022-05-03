@@ -59,7 +59,7 @@ export class TodoDetailComponent implements OnInit {
         if (this.todo) {
             // update todo with subTodos
             this.todo.arrtodos = this.subTodos.map(t => t.id);
-            this.todoService.updateTodo(this.todo)
+            this.todoService.updateTodo(this.todo)  // update on db
                 .subscribe(() => this.goBack());
         }
     }
@@ -83,6 +83,7 @@ export class TodoDetailComponent implements OnInit {
                 const alreadyHas = this.subTodos.map(t => t.id).includes(selected.id);
                 if (!alreadyHas) {
                     this.subTodos.push(selected);
+                    todo.arrtodos = this.subTodos.map(t => t.id);   // update on detail
                 }
             }
         });

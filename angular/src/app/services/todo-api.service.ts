@@ -41,7 +41,7 @@ export class TodoService {
     getTodosByPage(pageSize: number, pageIndex: number): Observable<TodoPage> {
         const url = `${this.apiUrl}/pages/${pageIndex}?size=${pageSize}`;
         return this.http.get<TodoPage>(url).pipe(
-            tap(res => console.log('res.length =', res.total)),
+            tap(res => console.log(`getByPage todos(${res.todos.length}) from ${pageSize * pageIndex}`)),
             catchError(this.handleError<TodoPage>('getTodosByPage', EMPTY_PAGE))
         );
     }
@@ -49,7 +49,7 @@ export class TodoService {
     getCandidatesByPage(pageSize: number, pageIndex: number, excludes: number[]): Observable<TodoPage> {
         const url = `${this.apiUrl}/candidates/${pageIndex}?size=${pageSize}&excludes=${excludes.join(',')}`;
         return this.http.get<TodoPage>(url).pipe(
-            tap(res => console.log('res.length =', res.total)),
+            tap(res => console.log(`getByPage candidates(${res.todos.length}) from ${pageSize * pageIndex}`)),
             catchError(this.handleError<TodoPage>('getCandidatesByPage', EMPTY_PAGE))
         );
     }
@@ -77,6 +77,7 @@ export class TodoService {
     }
 
     /* GET todos whose name contains search term */
+    // not yet implemented
     searchTodos(term: string): Observable<Todo[]> {
         // if not search term, return empty todo array.
         if (!term.trim()) {

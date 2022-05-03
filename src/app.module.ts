@@ -19,7 +19,7 @@ import { join } from 'path';
         }),
         // https://docs.nestjs.com/recipes/serve-static#bootstrap
         ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', '..', 'client-dist'),
+            rootPath: join(__dirname, '..', 'dist-client'),
             exclude: ['/api*'],
         }),
     ],

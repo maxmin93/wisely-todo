@@ -13,7 +13,7 @@ import { TodoService } from '../services/todo-api.service';
 export class TodoDialogComponent implements OnInit {
 
     todos: Todo[] = [];
-    candidates!: Todo[];
+    // candidates!: Todo[];
 
     // MatPaginator Inputs
     totalSize = 0;
@@ -29,13 +29,7 @@ export class TodoDialogComponent implements OnInit {
         // 필터링 (백엔드API로 처리)
         // - 조건1: 부모가 될 id 제외
         // - 조건2: 이미 sub-todos를 가진 id 제외
-        this.todoService.getTodos()
-            .subscribe(todos => {
-                this.candidates = todos.filter(t => t.id !== todo.id && !t.arrtodos);
-                this.totalSize = this.candidates.length;
-                // 초기 화면용
-                this.getTodosByPage(this.pageSize, this.pageIndex);
-            });
+        this.getTodosByPage(this.pageSize, this.pageIndex);
     }
 
     ngOnInit(): void {
@@ -57,8 +51,12 @@ export class TodoDialogComponent implements OnInit {
 
     // maxIndex = pageSize * (pageIndex + 1)
     getTodosByPage(pageSize: number, pageIndex: number) {
-        console.log('getTodosByPage', pageSize, pageIndex);
-        const skipSize = pageSize * pageIndex;
-        this.todos = this.candidates.slice(skipSize, skipSize + pageSize);
+        const excludes = this.todo.arrtodos ? this.todo.arrtodos.concat([this.todo.id]) : [this.todo.id];
+        this.todoService.getCandidatesByPage(this.pageSize, this.pageIndex, excludes)
+            .subscribe(page => {
+                console.log('getTodosByPage', pageSize, pageIndex);
+                this.totalSize = page.total;
+                this.todos = page.todos;
+            });
     }
 }

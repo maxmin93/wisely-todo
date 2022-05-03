@@ -1,7 +1,10 @@
 # compiled output
 /dist
 /node_modules
+/server-dist
 /client-dist
+/dist-server
+/dist-client
 /tmp
 /out-tsc
 /bazel-out
