@@ -47,3 +47,29 @@ ul.search-result {
     margin-top: 0;
     padding-left: 0;
 }
+
+.search-checkbox {
+    width: 8rem;
+    height: 1.5rem;
+    margin-right: .5rem;
+}
+
+.search-input {
+    float: left;
+    width: 33%;
+    width: 8rem;
+    height: 1.5rem;
+    margin-right: .5rem;
+}
+
+.search-button {
+    padding: .5rem 1.5rem;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-button:hover {
+    color: white;
+    background-color: #42545C;
+}
+

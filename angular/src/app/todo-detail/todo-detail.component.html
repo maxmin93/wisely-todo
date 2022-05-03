@@ -5,6 +5,11 @@
         <label for="todo-name">name: </label>
         <input id="todo-name" [(ngModel)]="todo.name" placeholder="Todo something" />
     </div>
+    <div style="margin: 1em 0 0 0;"><label>Done: </label>
+        <mat-checkbox style="margin: 0 12px;" color="accent" [disabled]="cannotDone" [(ngModel)]="todo.done"></mat-checkbox>
+    </div>
+    <div style="margin: 1em 0 0 0;"><label>created: </label>{{todo.created}}</div>
+    <div style="margin: 1em 0 0 0;"><label>updated: </label>{{todo.updated}}</div>
     <div *ngIf="subTodos" style="margin: 1em 0 0 0;">
         <label for="todo-name">sub-todos: </label>
         <ul class="sub-todos">
@@ -13,6 +18,7 @@
                     <span class="badge">{{subTodo.id}}</span> {{subTodo.name}}
                 </a>
                 <button type="button" class="delete" title="delete sub-todo" (click)="deleteSubTodo(subTodo)">x</button>
+                <span *ngIf="subTodo.done" class="done"></span>
             </li>
         </ul>
     </div>

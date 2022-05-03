@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, forkJoin, map, count, scan, skip, take } from 'rxjs';
 import { catchError, tap, filter } from 'rxjs/operators';
 
-import { Todo, TodoResponse, TodoPage } from './todo';
+import { Todo, TodoResponse, TodoPage, TodoSearch } from './todo';
 
 const EMPTY_PAGE: TodoPage = { total: 0, todos: [] };
 const EMPTY_RESPONSE: TodoResponse = { success: false, todo: undefined };
@@ -19,6 +19,11 @@ export class TodoService {
 
     httpOptions = {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+
+    searchOptions: TodoSearch = {
+        size: 5,
+        page: 0,
     };
 
     constructor(
@@ -76,19 +81,16 @@ export class TodoService {
         );
     }
 
-    /* GET todos whose name contains search term */
-    // not yet implemented
-    searchTodos(term: string): Observable<Todo[]> {
-        // if not search term, return empty todo array.
-        if (!term.trim()) {
-            return of([]);
-        }
-        const url = `${this.apiUrl}/name/${encodeURI(term)}`;
-        return this.http.get<Todo[]>(url).pipe(
-            tap(x => x.length ?
-                this.log(`found todos matching "${term}"`) :
-                this.log(`no todos matching "${term}"`)),
-            catchError(this.handleError<Todo[]>('searchTodos', []))
+    //////// Search methods //////////
+
+    searchTodos(dto: TodoSearch): Observable<TodoPage> {
+        this.searchOptions = dto;   // backup
+        const url = `${this.apiUrl}/search`;
+        return this.http.post<TodoPage>(url, dto, this.httpOptions).pipe(
+            tap(x => x.total ?
+                this.log(`found todos matching "${x.total}"`) :
+                this.log(`no todos matching "empty"`)),
+            catchError(this.handleError<TodoPage>('searchTodos'))
         );
     }
 
@@ -105,6 +107,7 @@ export class TodoService {
     /** PUT: update the todo on the server */
     updateTodo(todo: Todo): Observable<TodoResponse> {
         const url = `${this.apiUrl}/${todo.id}`;
+        console.log('update:', url, JSON.stringify(todo));
         return this.http.put<TodoResponse>(url, todo, this.httpOptions).pipe(
             tap((res: TodoResponse) => this.log(`update todo: ${res.success ? 'success' : 'fail'}`)),
             catchError(this.handleError<TodoResponse>('updateTodo'))

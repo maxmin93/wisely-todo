@@ -1,12 +1,22 @@
-<div id="search-component">
-    <label for="search-box">Todo Search</label>
-    <input #searchBox id="search-box" (input)="search(searchBox.value)" />
-
-    <ul class="search-result">
-        <li *ngFor="let todo of todos$ | async">
-            <a routerLink="/detail/{{todo.id}}">
-                {{todo.name}}
-            </a>
-        </li>
-    </ul>
-</div>
+<mat-expansion-panel [(expanded)]="panelOpenState">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Search
+        </mat-panel-title>
+        <mat-panel-description>
+            <mat-checkbox labelPosition="before" [disabled]="true" [checked]="searchForm.dirty">dirty</mat-checkbox>
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    <div class="search-fields">
+        <form [formGroup]="searchForm">
+            <mat-checkbox formControlName="done" class="search-input" matTooltip="double click if not DONE" matTooltipPosition="above">done</mat-checkbox>
+            <input matInput type="text" formControlName="term" class="search-input" matTooltip="name TEXT" matTooltipPosition="above">
+            <input matInput type="text" formControlName="from_dt" class="search-input" matTooltip="created FROM YYYY-MM-DD"matTooltipPosition="above">
+            <input matInput type="text" formControlName="to_dt" class="search-input" matTooltip="created TO YYYY-MM-DD" matTooltipPosition="above">
+        </form>
+    </div>
+    <div class="search-buttons">
+        <button type="button" class="search-button" (click)="doSearch()">search</button>
+        <button type="button" class="search-button" (click)="clear()">clear</button>
+    </div>
+</mat-expansion-panel>

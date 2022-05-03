@@ -45,7 +45,7 @@ export class TodoService {
     // excludes: 기준 id와 이미 추가된 sub-ids
     private queryCandidates(excludeIds: number[]) {
         return this.todoRepository.createQueryBuilder('todo')
-            .where(`todos is null and id not in (${excludeIds.join(',')})`);
+            .where(`done = 0 and todos is null and id not in (${excludeIds.join(',')})`);
     }
 
     async getCandidatesByPage(page: number, size: number, excludeIds: number[]): Promise<TodoPageDto> {
@@ -75,14 +75,16 @@ export class TodoService {
         if (dto.to_dt) {    // less than
             conditions.push(`created < '${dto.to_dt}'`);
         }
-        Logger.log(`search: ${conditions.join(' and ')}`);
-        return this.todoRepository.createQueryBuilder('todo')
-            .where(conditions.join(' and '));
+        return conditions.join(' and ');
     }
 
     async searchTodos(dto: SearchDto) {
-        const total = await this.queryByConditions(dto).getCount();
-        const todos = await this.queryByConditions(dto)
+        const whereClause = this.queryByConditions(dto);
+        Logger.log(`search(${dto.page},${dto.size}): ${whereClause}`);
+        const query = this.todoRepository.createQueryBuilder('todo')
+            .where(whereClause);
+        const total = await query.getCount();
+        const todos = await query
             .offset(dto.page * dto.size)    // skip
             .limit(dto.size)                // take
             .getMany();

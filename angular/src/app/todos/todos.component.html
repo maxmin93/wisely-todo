@@ -9,11 +9,19 @@
     </button>
 </div>
 
-<ul class="todos">
+<app-todo-search [searchOptions]="searchOptions" (searchEvent)="changeSearch($event)">
+</app-todo-search>
+
+<ul class="todos" style="margin-top: 2rem;">
     <li *ngFor="let todo of todos">
         <div>
             <a routerLink="/detail/{{todo.id}}">
                 <span class="badge">{{todo.id}}</span> {{todo.name}}
+                <div class="todo-properties">
+                    <span class="todo-date">{{ todo.created | slice:0:10}}</span>
+                    <span class="todo-date">{{ todo.updated | slice:0:10}}</span>
+                </div>
+                <span *ngIf="todo.done" class="done"></span>
             </a>
             <button type="button" class="delete" title="delete todo" (click)="delete(todo)">x</button>
             <button *ngIf="todo.arrtodos && todo.arrtodos.length > 0" type="button" class="has-subtodo"
@@ -26,9 +34,8 @@
 
 <mat-paginator hidePageSize="true" showFirstLastButtons="true"
     [length]="totalSize"
-    [pageSize]="pageSize"
-    [pageIndex]="pageIndex"
-    [pageSizeOptions]="pageSizeOptions"
+    [pageSize]="searchOptions.size"
+    [pageIndex]="searchOptions.page"
     (page)="handlePageEvent($event)"
     aria-label="Select page">
 </mat-paginator>

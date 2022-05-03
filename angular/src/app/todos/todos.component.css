@@ -3,7 +3,7 @@
     margin: 0 0 2em 0;
     list-style-type: none;
     padding: 0;
-    width: 15em;
+    width: 18em;
 }
 
 input {
@@ -29,7 +29,7 @@ input {
     background-color: #EEE;
     margin: .5em;
     padding: .3em 0;
-    height: 1.6em;
+    height: 2.6em;
     border-radius: 4px;
     display: block;
     width: 100%;
@@ -62,10 +62,27 @@ input {
     border-radius: 4px 0 0 4px;
 }
 
+.todos .done {
+    display: inline-block;
+    font-size: small;
+    color: white;
+    padding: 0.8em 0.7em 0 0.7em;
+    background-color: orange;
+    line-height: 1em;
+    position: absolute;
+    left: 7px;
+    bottom: 0px;
+    height: .5em;
+    width: 16px;
+    text-align: right;
+    margin-right: .8em;
+    border-radius: 4px 0 0 4px;
+}
+
 .add-button {
     padding: .5rem 1.5rem;
     font-size: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .add-button:hover {
@@ -75,8 +92,8 @@ input {
 
 button.delete {
     position: absolute;
-    left: 210px;
-    top: 5px;
+    left: 255px;
+    top: 15px;
     background-color: white;
     color: #525252;
     font-size: 1.1rem;
@@ -86,8 +103,8 @@ button.delete {
 
 button.has-subtodo {
     position: absolute;
-    left: 270px;
-    top: 5px;
+    left: 300px;
+    top: 15px;
     background-color: yellowgreen;
     color: #525252;
     font-size: 1.1rem;
@@ -104,4 +121,18 @@ button.delete:hover {
 ::ng-deep .mat-icon-button.mat-button-disabled.mat-button-disabled {
     color: white;
     background-color: grey;
+}
+
+.todo-properties {
+    width: 95%;
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 5px;
+    padding-left: 16px;
+}
+
+.todo-date {
+    margin: 0 0 0 2rem;
+    color: #000;
+    font-size: 12px;
 }
