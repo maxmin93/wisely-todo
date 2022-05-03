@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prebuild": "rimraf dist",
+    "clean": "rimraf dist-server && rimraf dist-client",
+    "prebuild": "npm install && cd angular && npm install",
     "build": "npm run build:angular && npm run build:nest",
     "build:nest": "nest build",
     "build:angular": "cd angular && ng build --aot --prod",
