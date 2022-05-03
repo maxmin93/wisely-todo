@@ -12,6 +12,9 @@ export class TodoDto {
     @IsNotEmpty()
     name: string;
 
+    @IsBoolean()
+    done: boolean;
+
     arrtodos: number[];
 }
 
@@ -24,8 +27,8 @@ export class TodoResponseDto {
 
     todo: Todo = undefined;
 
-    public constructor( todo?: any ){
-        if( todo && todo instanceof Todo ){
+    public constructor(todo?: any) {
+        if (todo && todo instanceof Todo) {
             this.todo = todo;
             this.success = true;
         }
@@ -42,8 +45,26 @@ export class TodoPageDto {
     @IsArray()
     todos: Todo[] = [];
 
-    public constructor( total: number, todos: Todo[] ){
+    public constructor(total: number, todos: Todo[]) {
         this.total = total;
         this.todos = todos === undefined ? [] : todos;
     }
+}
+
+// for search
+export class SearchDto {
+
+    @IsNumber()
+    size: number;
+
+    @IsNumber()
+    page: number;
+
+    term?: string;
+
+    done?: boolean;
+
+    from_dt?: string;    // YYYY-MM-DD
+
+    to_dt?: string;      // YYYY-MM-DD
 }

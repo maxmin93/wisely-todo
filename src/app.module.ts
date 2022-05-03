@@ -14,6 +14,7 @@ import { join } from 'path';
             type: "sqlite",
             database: "todos.db",
             entities: [__dirname + "/**/*.entity{.ts,.js}"],
+            // timezone: 'Asia/Seoul',
             synchronize: true,
             keepConnectionAlive: true     // when e2e test
         }),

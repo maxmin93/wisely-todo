@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Repository, UpdateResult, DeleteResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Todo } from './todo.entity';
-import { TodoResponseDto, TodoPageDto } from './todo.dto';
+import { TodoResponseDto, TodoPageDto, SearchDto } from './todo.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class TodoService {
@@ -18,6 +19,7 @@ export class TodoService {
     async getAll(): Promise<Todo[]> {
         return await this.todoRepository.find();
     }
+
     async existIds(ids: number[]): Promise<number[]> {
         const todos = await this.todoRepository.findByIds(ids);
         return todos.map(t => t.id);
@@ -26,6 +28,7 @@ export class TodoService {
     async getById(id: number): Promise<Todo> {
         return await this.todoRepository.findOne(id);
     }
+
     async getByIds(ids: number[]): Promise<Todo[]> {
         return await this.todoRepository.findByIds(ids);
     }
@@ -42,13 +45,46 @@ export class TodoService {
     // excludes: 기준 id와 이미 추가된 sub-ids
     private queryCandidates(excludeIds: number[]) {
         return this.todoRepository.createQueryBuilder('todo')
-            .where(`todos is null and id not in (${excludeIds.join(',')})`)
+            .where(`todos is null and id not in (${excludeIds.join(',')})`);
     }
+
     async getCandidatesByPage(page: number, size: number, excludeIds: number[]): Promise<TodoPageDto> {
         const total = await this.queryCandidates(excludeIds).getCount();
         const todos = await this.queryCandidates(excludeIds)
             .offset(page * size)    // skip
             .limit(size)            // take
+            .getMany();
+        return new TodoPageDto(total, todos);
+    }
+
+    ///////////////////////////////////////
+    // search by term
+
+    private queryByConditions(dto: SearchDto) {
+        const conditions: string[] = [];
+        if (dto.term) {
+            conditions.push(`name like '%${dto.term}%'`);
+        }
+        if (dto.done != undefined) {
+            if (dto.done) conditions.push('done != 0');
+            else conditions.push('done = 0');
+        }
+        if (dto.from_dt) {  // equal or greater than
+            conditions.push(`created > '${dto.from_dt}'`);
+        }
+        if (dto.to_dt) {    // less than
+            conditions.push(`created < '${dto.to_dt}'`);
+        }
+        Logger.log(`search: ${conditions.join(' and ')}`);
+        return this.todoRepository.createQueryBuilder('todo')
+            .where(conditions.join(' and '));
+    }
+
+    async searchTodos(dto: SearchDto) {
+        const total = await this.queryByConditions(dto).getCount();
+        const todos = await this.queryByConditions(dto)
+            .offset(dto.page * dto.size)    // skip
+            .limit(dto.size)                // take
             .getMany();
         return new TodoPageDto(total, todos);
     }
@@ -79,6 +115,7 @@ export class TodoService {
         // return new TodoResponseDto();
 
         // save를 사용하니 아무 문제 없다. (왜지?)
+        todo.updated = moment().format("YYYY-MM-DD HH:mm:ss");    // localtime
         try {
             Logger.log(`updateTodo: id=${todo.id}`);
             return new TodoResponseDto(await this.todoRepository.save(todo));

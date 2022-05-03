@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Todo } from './todo.entity';
 import { TodoDto } from './todo.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class TodoFactory {
@@ -10,6 +11,7 @@ export class TodoFactory {
         const entity = new Todo();
         entity.id = dto.id;
         entity.name = dto.name;
+        entity.done = dto.hasOwnProperty('done') ? dto.done : undefined;
         entity.todos = dto.arrtodos ? dto.arrtodos.join(',') : undefined;
         return entity;
     }
@@ -33,10 +35,10 @@ export class TodoFactory {
     // utils
 
     public convertToIds(ids: string): number[] {
-        try{
-            return ids ? ids.split(',').map(r=>parseInt(r,10)).filter(r=>r) : [];
+        try {
+            return ids ? ids.split(',').map(r => parseInt(r, 10)).filter(r => r) : [];
         }
-        catch{
+        catch {
             return [];
         }
     }
@@ -44,4 +46,9 @@ export class TodoFactory {
     public isNumeric(val: any): boolean {
         return val && !isNaN(Number(val));
     }
+
+    public isDateString(val: any): boolean {
+        return val && moment(val.toString(), 'YYYY-MM-DD', true).isValid();
+    }
+
 }

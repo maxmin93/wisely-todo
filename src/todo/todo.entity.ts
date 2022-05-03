@@ -10,10 +10,25 @@ export class Todo {
     @Column('varchar', { length: 200, nullable: false, unique: false })
     name: string;
 
+    @Column('integer', { default: 0 })
+    done: boolean;
+
+    @Column('varchar', {
+        length: 20, nullable: false
+        , default: () => "datetime('now','localtime')"
+    })
+    created: string;
+
+    @Column('varchar', {
+        length: 20, nullable: false
+        , default: () => "datetime('now','localtime')"
+    })
+    updated: string;
+
     // Controller에서 ClassSerializerInterceptor로 Serialization 필터링
     // https://docs.nestjs.com/techniques/serialization#exclude-properties
     @Exclude()
-    @Column('varchar', { nullable: true, unique: false })
+    @Column('varchar', { nullable: true })
     todos: string | undefined;
 
     // readonly

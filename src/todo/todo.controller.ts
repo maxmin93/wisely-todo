@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Put, Delete, Param, Request, Body, Query } from '@nestjs/common';
 import { UseInterceptors, ClassSerializerInterceptor, ParseIntPipe } from '@nestjs/common';
 import { Todo } from './todo.entity';
-import { TodoDto, TodoResponseDto } from './todo.dto';
+import { TodoDto, SearchDto } from './todo.dto';
 import { TodoFactory } from './todo.factory';
 import { TodoService } from './todo.service';
 
@@ -23,6 +23,11 @@ export class TodoController {
     @Get('all')
     async getAll(): Promise<Todo[]> {
         return await this.todoService.getAll();
+    }
+
+    @Get(':id')
+    async getById(@Param('id', ParseIntPipe) id: number): Promise<Todo> {
+        return await this.todoService.getById(id);
     }
 
     @Get('ids/:ids')
@@ -51,9 +56,21 @@ export class TodoController {
         return await this.todoService.getCandidatesByPage(page, size, excludeIds);
     }
 
-    @Get(':id')
-    async getById(@Param('id', ParseIntPipe) id: number): Promise<Todo> {
-        return await this.todoService.getById(id);
+    ///////////////////////////////////////
+    // search
+
+    @Post('search')
+    async searchTodos(@Body() dto: SearchDto) {
+        if (dto.term) {
+            dto.term = dto.term.replace(/[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 ]/g, '');
+        }
+        if (dto.from_dt && this.todoFactory.isDateString(dto.from_dt.substring(0, 10))) {
+            dto.from_dt = dto.from_dt.substring(0, 10);
+        }
+        if (dto.to_dt && this.todoFactory.isDateString(dto.to_dt.substring(0, 10))) {
+            dto.to_dt = dto.to_dt.substring(0, 10);
+        }
+        return await this.todoService.searchTodos(dto);
     }
 
     ///////////////////////////////////////
