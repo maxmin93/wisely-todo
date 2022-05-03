@@ -76,6 +76,7 @@ describe('TodoController', () => {
         it('create Todo{ name }', async () => {
             const dto = new TodoDto();
             dto.name = 'hello, new Todo';
+            dto.done = false;
             const res = await todoController.createTodo(dto);
             expect(res.success).toEqual(true);
             expect(res.todo).toBeTruthy();
@@ -90,6 +91,7 @@ describe('TodoController', () => {
             const dto = new TodoDto();
             dto.id = todos[todos.length - 2].id;
             dto.name = todos[todos.length - 2].name;
+            dto.done = todos[todos.length - 2].done;
             dto.arrtodos = [11, todos[todos.length - 1].id];
             const res = await todoController.updateTodo(dto.id, dto);
             expect(res.success).toEqual(true);

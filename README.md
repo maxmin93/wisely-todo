@@ -87,8 +87,23 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
+...
+ FAIL  src/todo/todo.controller.spec.ts
+  TodoController
+    select TODO
+      ✓ /api/todo/all (12 ms)
+      ✓ /api/todo/11 (2 ms)
+      ✓ /api/todo/ids/11,12
+      ✓ /api/todo/pages/0 (1 ms)
+      ✓ /api/todo/candidates/0?excludes=11
+    create, update, delete TODO
+      ✓ create Todo{ name } (15 ms)
+      ✓ update Todo{ arrtodos } (8 ms)
+      ✓ delete Todo{ id } (3 ms)
+      ✕ update Todo{ arrtodos } cascade by delete (2 ms)
+...
 
-# e2e tests
+# e2e tests (잘 되었던게 안됨)
 $ npm run test:e2e
 ```
 
@@ -110,17 +125,20 @@ $ sqlite3 todos.db -header -column
 
 > pragma table_info('todo');
 cid  name   type          notnull  dflt_value  pk
----  -----  ------------  -------  ----------  --
-0    id     integer       1                    1
-1    name   varchar(200)  1                    0
-2    todos  varchar       0                    0
+---  -------  ------------  -------  ---------------------------  --
+0    id       integer       1                                     1
+1    name     varchar(200)  1                                     0
+2    done     integer       1        0                            0
+3    created  varchar(20)   1        datetime('now','localtime')  0
+4    updated  varchar(20)   1        datetime('now','localtime')  0
+5    todos    varchar       0                                     0
 
-> select * from todo limit 3;
-id  name       todos
---  ---------  --------
-11  와이즐리 제품
-12  리필면도날 4개입
-13  면도기 스타터세트  11,16,17
+> select * from todo where created > '2022-04-29';
+id  name               done  created              updated              todos
+--  -----------------  ----  -------------------  -------------------  -----
+28  혈앵,눈건강,기억력 오메가3    0     2022-04-29 12:00:00  2022-04-29 12:00:00  29
+30  뼈,신경,근육엔 칼슘마그네슘    0     2022-04-30 12:00:00  2022-04-30 12:00:00
+38  hello new Todo 38  0     2022-05-04 01:18:44  2022-05-04 01:22:23  18,19
 
 > .quit
 ```
@@ -138,15 +156,21 @@ id  name       todos
   - GET [http://localhost:3000/api/todo/pages/2?size=3](http://localhost:3000/api/todo/pages/2?size=3) : size 파라미터
 - GET [http://localhost:3000/api/todo/candidates/2?excludes=11,12](http://localhost:3000/api/todo/candidates/2?excludes=11,12) : 하위 Todo 후보의 페이지 반환
   - 하위 Todo 후보는 전체 Todo 에서 아래 조건을 포함하는 Todo 만으로 제한합니다.
+    - 완료 상태 Todo 제외
     - 포함될 상위 Todo 제외
     - 하위 Todo를 가진 Todo 제외
+
+### search
+
+- POST `http://localhost:3000/api/todo/search` : Todo 검색
+  - body `{ "size": 5, "page": 0, "done": true }`
 
 ### create, update, delete APIs
 
 - POST `http://localhost:3000/api/todo` : Todo 추가
-  - body `{ "name": "hello40" }`
+  - body `{ "name": "hello40", "done": false }`
 - PUT `http://localhost:3000/api/todo/40` : Todo 수정
-  - body `{ "id": 40, "name": "hello40", "arrtodos": [11,42] }`
+  - body `{ "id": 40, "name": "hello40", "done": true, "arrtodos": [11,42] }`
 - DELETE `http://localhost:3000/api/todo/40` : Todo 삭제
 
 ## UI (Screens)
@@ -155,16 +179,53 @@ id  name       todos
 
 기본 페이지로 사용되고, Todo 를 등록/삭제하거나 리스트를 조회합니다.
 
-![todos-list](/docs/todos-list.png)
+- 리스트 상에서 완료된 Todo 는 id 아래에 주황색 표시로 강조됩니다.
+- 하위 항목이 있는 경우 오른쪽에 숫자가 표시됩니다.
+
+![todo-list](/docs/todo-list.png)
+
+상단 입력상자와 `Add todo` 버튼으로 Todo 를 등록할 수 있습니다.<br>
+(추가된 상태를 쉽게 알아보기 위해 리스트 상단에 출력하도록 했습니다)
+
+![todo-list-insert](/docs/todo-list-insert.png)
+
+검색 결과와 pagination 을 연동하였습니다.<br>
+(검색 옵션 변경시 pagination 도 변경됨)
+
+![todo-list-pagination](/docs/todo-list-pagination.png)
+
+검색 옵션으로 `done(완료여부)`, `name 검색`, `created 시작일`, `created 종료일` 을 사용할 수 있습니다.<br>
+
+- name 검색어에 대해 특수문자를 삭제 처리 후 매칭
+- created 시작일과 종료일은 "YYYY-MM-DD" 형식을 확인후 매칭
+
+![todo-list-search-done](/docs/todo-list-search-done.png)
+
+![todo-list-search-name](/docs/todo-list-search-name.png)
+
+![todo-list-search-date](/docs/todo-list-search-date.png)
 
 ### Todo 상세 페이지
 
 특정 Todo 에 상세 내용을 조회하고, 하위 Todo 를 추가/삭제합니다.<br>
 하위 Todo 는 다이얼로그 창을 통해 선택합니다.
 
-![todo-detail](/docs/todo-detail.png)
+![todo-detail-done](/docs/todo-detail-done.png)
+
+하위 Todo 선택을 위한 다이얼로그 창은 `add sub-todo` 버는을 누르면 나타납니다.<br>
+선택 가능한 하위 Todo의 조건은 미완료 상태이고, 하위 Todo 가 없는 항목들입니다.
 
 ![todo-detail-dialog](/docs/todo-detail-dialog.png)
+
+`save` 버튼을 누르면 Todo 의 내용이 변경됩니다.<br>
+(변경 가능한 항목은 name, done, 하위 Todo 리스트 입니다)
+
+![todo-detail-update](/docs/todo-detail-update.png)
+
+하위 Todo 항목에 미완료 Todo 가 포함된 경우 `Done 체크박스` 가 비활성화 됩니다.<br>
+(완료 상태이더라도 미완료 Todo 가 추가된 경우 미완료 상태로 변경됩니다)
+
+![todo-detail-undone](/docs/todo-detail-undone.png)
 
 ## License
 
